@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 文件映射器，指定类文件 -->
+        <property name="configLocation" value="classpath:./mybatis/mybatis-config.xml"/>
+    </bean>
+
+    <bean id="accountMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface"  value="com.ugc.sso.server.mapper.IAccountMapper"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <!-- SSO本地服务· -->
+    <bean id="ssoService" class="com.ugc.sso.server.service.impl.SSOService">
+        <property name="accountMapper" ref="accountMapper"/>
+        <property name="redisTemplate" ref="redisTemplate"/>
+        <property name="userSessionExpire" value="${user_session_expire:1800000}"/>
+    </bean>
+
+    <!-- SSO远程服务· -->
+    <bean id="ssoServiceFacade" class="com.ugc.sso.server.service.impl.SSOServiceFacade">
+        <property name="ssoService" ref="ssoService"/>
+    </bean>
+</beans>
